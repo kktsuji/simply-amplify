@@ -1,0 +1,12 @@
+
+type User  @model {
+  id: ID!
+  name: String!
+}
+
+type Location @model {
+ 	 id: ID!
+     location: String
+     user: ID!
+}
+
