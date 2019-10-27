@@ -4,19 +4,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
 import android.util.Log
-import androidx.core.app.ComponentActivity
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.view.View
 import android.widget.Button
 import android.widget.Toast
-import androidx.fragment.app.FragmentActivity
 import com.amazonaws.mobile.client.*
 import com.amazonaws.mobile.config.AWSConfiguration
 import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient
-
-
+import com.amazonaws.amplify.generated.graphql.CreateUserMutation
+import type.CreateUserInput
+import com.apollographql.apollo.exception.ApolloException
+import com.apollographql.apollo.GraphQLCall
+import com.apollographql.apollo.api.Response
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         // サインアウトボタンの定義
         val buttonSignout = findViewById(R.id.buttonSignout) as Button
         buttonSignout.setOnClickListener{
+            this.runMutation()
             AWSMobileClient.getInstance().signOut()
             //AWSMobileClient.getInstance().signOut(SignOutOptions.builder().signOutGlobally(true).build())
             initializeAWSMobileClient()
@@ -42,11 +40,14 @@ class MainActivity : AppCompatActivity() {
 
         // graphql
         mAWSAppSyncClient = AWSAppSyncClient.builder()
-            .context(getApplicationContext())
-            .awsConfiguration(AWSConfiguration(getApplicationContext()))
+            //.context(getApplicationContext())
+            .context(applicationContext)
+            //.awsConfiguration(AWSConfiguration(getApplicationContext()))
+            .awsConfiguration(AWSConfiguration(applicationContext))
             .build()
     }
 
+    // ログイン初期化
     fun initializeAWSMobileClient(){
         AWSMobileClient.getInstance().initialize(applicationContext, object : Callback<UserStateDetails> {
             override fun onResult(userStateDetails: UserStateDetails) {
@@ -80,4 +81,31 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    // dbへデータ追加
+    fun runMutation() {
+        val createUserInput =
+            CreateUserInput.builder()
+                .name("John")
+                .build()
+
+        mAWSAppSyncClient!!.mutate(CreateUserMutation.builder().input(createUserInput).build())
+            .enqueue(mutationCallback)
+    }
+
+    // コールバックの定義
+    private val mutationCallback = object: GraphQLCall.Callback<CreateUserMutation.Data>() {
+
+        override fun onResponse(response: Response<CreateUserMutation.Data>) {
+            //Log.i("Results", "Added Todo")
+            Log.i("Results", response.data().toString())
+            //Toast.makeText(applicationContext, "Good", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onFailure(e: ApolloException) {
+            Log.e("Error", e.toString())
+        }
+    }
+
+
 }
