@@ -151,7 +151,7 @@ fabric.properties
 node_modules
 .envrc
 
-#amplify
+amplify
 amplify/\#current-cloud-backend
 amplify/.config/local-*
 amplify/mock-data
@@ -162,5 +162,3 @@ dist/
 node_modules/
 aws-exports.js
 awsconfiguration.json
-amplify/
-
