@@ -13,9 +13,16 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.amazonaws.mobile.client.*
+import com.amazonaws.mobile.config.AWSConfiguration
+import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient
+
+
 
 
 class MainActivity : AppCompatActivity() {
+
+    // graphql
+    private var mAWSAppSyncClient: AWSAppSyncClient? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +40,11 @@ class MainActivity : AppCompatActivity() {
             //Toast.makeText(this, "Good", Toast.LENGTH_SHORT).show()
         }
 
+        // graphql
+        mAWSAppSyncClient = AWSAppSyncClient.builder()
+            .context(getApplicationContext())
+            .awsConfiguration(AWSConfiguration(getApplicationContext()))
+            .build()
     }
 
     fun initializeAWSMobileClient(){
