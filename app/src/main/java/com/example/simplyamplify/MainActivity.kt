@@ -8,6 +8,9 @@ import androidx.core.app.ComponentActivity
 import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.view.View
+import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.amazonaws.mobile.client.*
 
@@ -18,6 +21,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // ログイン画面
+        initializeAWSMobileClient()
+
+        // サインアウトボタンの定義
+        val buttonSignout = findViewById(R.id.buttonSignout) as Button
+        buttonSignout.setOnClickListener{
+            AWSMobileClient.getInstance().signOut()
+            //AWSMobileClient.getInstance().signOut(SignOutOptions.builder().signOutGlobally(true).build())
+            initializeAWSMobileClient()
+            //Toast.makeText(this, "Good", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    fun initializeAWSMobileClient(){
         AWSMobileClient.getInstance().initialize(applicationContext, object : Callback<UserStateDetails> {
             override fun onResult(userStateDetails: UserStateDetails) {
                 when (userStateDetails.userState) {
